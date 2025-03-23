@@ -1,64 +1,121 @@
-# EKS with Terraform Sample Project
+# EKS Terraform Gradio Sample
 
-このプロジェクトは、TerraformでAmazon EKS (Elastic Kubernetes Service) クラスターを作成するサンプルです。
+TerraformでEKSクラスターを作成し、Gradioアプリケーションをデプロイするサンプルプロジェクトです。
 
 ## 前提条件
 
-- [Terraform](https://www.terraform.io/downloads.html) (v1.0.0以上)
-- [AWS CLI](https://aws.amazon.com/cli/) (設定済み)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- AWS CLI (設定済み)
+- Terraform v1.0.0以上
+- kubectl
+- Docker
 
 ## プロジェクト構成
 
 ```
 .
-├── main.tf          # メインのTerraform設定
-├── variables.tf     # 変数定義
-├── outputs.tf       # 出力定義
-├── providers.tf     # プロバイダー設定
-├── eks.tf          # EKSクラスター設定
-├── vpc.tf          # VPC設定
-└── README.md       # このファイル
+├── gradio-app/          # Gradioアプリケーション
+└── terraform/           # EKSクラスター用Terraform設定
 ```
 
-## 使用方法
+## デプロイ手順
 
-1. 初期化
+### 1. EKSクラスターの作成
 
+1. Terraformの初期化：
 ```bash
 terraform init
 ```
 
-2. 計画の確認
-
+2. 実行プランの確認：
 ```bash
 terraform plan
 ```
 
-3. リソースの作成
-
+3. インフラストラクチャのデプロイ：
 ```bash
 terraform apply
 ```
 
-4. クラスターへの接続設定
-
+4. kubectlの設定：
 ```bash
 aws eks update-kubeconfig --name eks-sample-cluster --region ap-northeast-1
 ```
 
-5. クラスターの状態確認
-
+5. ノードの確認：
 ```bash
 kubectl get nodes
 ```
 
-## リソースの削除
+### 2. Gradioアプリケーションのデプロイ
 
+1. ECRへのログイン：
+```bash
+aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-1.amazonaws.com
+```
+
+2. Dockerイメージのビルドとプッシュ：
+```bash
+cd gradio-app
+docker build -t gradio-app:latest .
+docker tag gradio-app:latest [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-1.amazonaws.com/gradio-app:latest
+docker push [AWS_ACCOUNT_ID].dkr.ecr.ap-northeast-1.amazonaws.com/gradio-app:latest
+```
+
+3. Kubernetesマニフェストの適用：
+```bash
+kubectl apply -f k8s-deployment.yaml
+```
+
+4. サービスの確認：
+```bash
+kubectl get service gradio-app-service
+```
+
+## クリーンアップ
+
+1. アプリケーションの削除：
+```bash
+kubectl delete -f k8s-deployment.yaml
+```
+
+2. EKSクラスターの削除：
 ```bash
 terraform destroy
 ```
 
+## 設定のカスタマイズ
+
+- `variables.tf`: クラスター名やノードグループの設定を変更できます
+- `vpc.tf`: VPCやサブネットの設定をカスタマイズできます
+- `eks.tf`: EKSクラスターの詳細設定を変更できます
+
+## トラブルシューティング
+
+### ノードグループが作成されない場合
+- VPCのサブネットタグを確認してください
+- IAMロールの権限を確認してください
+
+### アプリケーションがデプロイできない場合
+- ECRのイメージパスが正しいか確認してください
+- k8s-deployment.yamlのイメージ参照を確認してください
+
+## デプロイメント出力例
+
+### アプリケーションの再起動
+```bash
+# デプロイメントの再起動
+kubectl rollout restart deployment gradio-app
+
+# 再起動後の状態
+deployment.apps/gradio-app restarted
+
+NAME                          READY   STATUS        RESTARTS        AGE
+gradio-app-675dbd69d5-x5mrc   1/1     Running       0               11s
+gradio-app-9fbc54c68-kbf9k    1/1     Terminating   7 (6m50s ago)   13m
+```
+
+
 ## 注意事項
 
-このサンプルプロジェクトは学習目的で作成されています。実際の本番環境では、セキュリティやスケーラビリティを考慮した追加設定が必要です。
+- このプロジェクトはサンプルです。本番環境では適切なセキュリティ設定を行ってください。
+- 不要な課金を防ぐため、使用後は必ずリソースを削除してください。
