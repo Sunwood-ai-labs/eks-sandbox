@@ -1,72 +1,73 @@
-# Simple Gradio Application for EKS
+# シンプルなGradioアプリ
 
-This is a simple Gradio web application that can be deployed to Amazon EKS (Elastic Kubernetes Service).
+EKSにデプロイするためのシンプルなGradioアプリケーションです。
 
-## Application Overview
+## アプリケーションの概要
 
-The application is a simple sketch-to-image converter that demonstrates Gradio's capabilities. Users can draw sketches and see them displayed as images.
+シンプルな挨拶を返すWebアプリケーションです。名前を入力すると「こんにちは、〇〇さん！」というメッセージを返します。
 
-## Local Development
+## ローカルでの開発
 
-### Prerequisites
-
-- Python 3.9+
-- pip
-
-### Setup
-
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-2. Run the application locally:
-   ```
-   python app.py
-   ```
-
-3. Open your browser and navigate to `http://localhost:7860`
-
-## Deployment to EKS
-
-### Prerequisites
+### 必要条件
 
 - Docker
-- AWS CLI configured
-- kubectl configured to work with your EKS cluster
-- An ECR repository named 'gradio-app'
+- Docker Compose
 
-### Deployment Steps
+### ローカルでの実行方法
 
-1. Build the Docker image:
-   ```
-   docker build -t gradio-app .
-   ```
-
-2. Tag and push the image to ECR:
-   ```
-   aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
-   docker tag gradio-app:latest <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/gradio-app:latest
-   docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/gradio-app:latest
-   ```
-
-3. Update the image reference in `k8s-deployment.yaml` with your AWS account ID and region.
-
-4. Deploy to Kubernetes:
-   ```
-   kubectl apply -f k8s-deployment.yaml
-   ```
-
-5. Get the external IP/URL of the service:
-   ```
-   kubectl get service gradio-app-service
-   ```
-
-6. Access your application using the EXTERNAL-IP provided by the service.
-
-## Cleaning Up
-
-To remove the deployment from your EKS cluster:
+1. リポジトリをクローンします：
+```bash
+git clone <repository-url>
+cd gradio-app
 ```
-kubectl delete -f k8s-deployment.yaml
+
+2. Docker Composeでアプリを起動します：
+```bash
+docker compose up --build
 ```
+
+3. ブラウザで以下のURLにアクセスします：
+```
+http://localhost:7860
+```
+
+## ファイル構成
+
+- `app.py` - Gradioアプリケーションのメインコード
+- `requirements.txt` - Pythonの依存関係
+- `Dockerfile` - コンテナイメージのビルド設定
+- `docker-compose.yml` - ローカル開発用の設定
+- `k8s-deployment.yaml` - Kubernetes用のデプロイメント設定
+
+## 技術スタック
+
+- Python 3.10
+- Gradio 5.x
+- Docker
+- Kubernetes (EKS)
+
+## トラブルシューティング
+
+### Gradio 5.xのインストールエラー
+Python 3.10以上が必要です。Dockerfileで適切なPythonバージョンを指定していることを確認してください。
+
+## デプロイ手順
+
+1. イメージのビルド：
+```bash
+docker build -t gradio-app:latest .
+```
+
+2. イメージのタグ付け：
+```bash
+docker tag gradio-app:latest <your-registry>/gradio-app:latest
+```
+
+3. イメージのプッシュ：
+```bash
+docker push <your-registry>/gradio-app:latest
+```
+
+4. Kubernetesへのデプロイ：
+```bash
+kubectl apply -f k8s-deployment.yaml
