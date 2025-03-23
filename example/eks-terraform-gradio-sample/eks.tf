@@ -4,7 +4,7 @@ module "eks" {
   version = "~> 18.0"
 
   cluster_name    = var.cluster_name
-  cluster_version = "1.24"
+  cluster_version = "1.28"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -22,6 +22,7 @@ module "eks" {
       name = var.node_group_name
 
       instance_types = [var.node_instance_type]
+      version       = "1.28"
 
       min_size     = var.node_min_capacity
       max_size     = var.node_max_capacity
@@ -29,7 +30,7 @@ module "eks" {
 
       # ノードグループのIAMロールに追加するポリシー
       iam_role_additional_policies = [
-        "arn:aws:iam::aws:policy/AmazonECR-FullAccess",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess",
         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       ]
     }
@@ -38,7 +39,7 @@ module "eks" {
   # クラスターセキュリティグループに追加するルール
   cluster_security_group_additional_rules = {
     ingress_nodes_ephemeral_ports_tcp = {
-      description                = "ノードからクラスターへのアクセス"
+      description                = "Node to cluster access"
       protocol                   = "tcp"
       from_port                  = 1025
       to_port                    = 65535
@@ -50,7 +51,7 @@ module "eks" {
   # ノードセキュリティグループに追加するルール
   node_security_group_additional_rules = {
     ingress_self_all = {
-      description = "ノード間の通信を許可"
+      description = "Allow inter-node communication"
       protocol    = "-1"
       from_port   = 0
       to_port     = 0
@@ -58,7 +59,7 @@ module "eks" {
       self        = true
     }
     egress_all = {
-      description = "全ての外部通信を許可"
+      description = "Allow all external communication"
       protocol    = "-1"
       from_port   = 0
       to_port     = 0
