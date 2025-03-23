@@ -2,6 +2,8 @@
 
 TerraformでEKSクラスターを作成し、Gradioアプリケーションをデプロイするサンプルプロジェクトです。
 
+![](./asset/flow.svg)
+
 ## 前提条件
 
 - AWS CLI (設定済み)
