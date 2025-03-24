@@ -37,3 +37,4 @@ override.tf.json
 terraform.rc
 .qodo
 example/eks-terraform-gradio-sample/.terraform.lock.hcl
+example/eks-terraform-share-resource/terraform/.terraform.lock.hcl
