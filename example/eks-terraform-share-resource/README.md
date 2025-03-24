@@ -1,30 +1,34 @@
 # EKS Shared Resources Sample 🚀
 
-このプロジェクトは、AWS EKSクラスターに複数のGradioアプリケーションをデプロイするサンプルです。3つのシンプルなGradioアプリが同じEKSクラスター上で動作し、リソースを共有します。
+複数のGradioアプリケーションをAWS EKSクラスターで効率的に実行するサンプルプロジェクト
 
-## 📱 アプリケーション
+## 📑 目次
+- [📑 目次](#-目次)
+- [📱 概要](#-概要)
+- [🛠️ 技術スタック](#️-技術スタック)
+- [📋 前提条件](#-前提条件)
+- [🚀 デプロイ手順](#-デプロイ手順)
+- [⚙️ リソースの最適化](#️-リソースの最適化)
+  - [現在の設定](#現在の設定)
+  - [推奨ノード設定](#推奨ノード設定)
+  - [スケーリングの考え方](#スケーリングの考え方)
+- [🧹 クリーンアップ](#-クリーンアップ)
+- [⚠️ 注意事項](#️-注意事項)
 
-1. **カウンターアプリ**
-   - シンプルなカウンター機能
-   - カウントアップとリセット機能
+## 📱 概要
 
-2. **計算機アプリ**
-   - 基本的な四則演算
-   - 直感的なインターフェース
+このプロジェクトは、以下の3つのGradioアプリケーションをEKS上で実行します：
 
-3. **テキスト変換アプリ**
-   - テキストの大文字/小文字変換
-   - 文字の反転
-   - スペースの除去
+- **カウンターアプリ**: シンプルなカウントアップとリセット機能
+- **計算機アプリ**: 基本的な四則演算機能
+- **テキスト変換アプリ**: テキストの大文字/小文字変換、反転機能
 
 ## 🛠️ 技術スタック
 
-- AWS EKS
-- Terraform
-- Docker
-- Kubernetes
-- Gradio
-- Python
+- AWS EKS (Kubernetes管理サービス)
+- Terraform (インフラストラクチャのコード化)
+- Docker (コンテナ化)
+- Gradio (Pythonウェブアプリケーション)
 
 ## 📋 前提条件
 
@@ -35,8 +39,13 @@
 
 ## 🚀 デプロイ手順
 
-### 1. Terraformでインフラストラクチャを作成
+1. 環境変数の設定
+```bash
+cp .env.example .env
+# .envファイルを編集して必要な値を設定
+```
 
+2. インフラストラクチャのデプロイ
 ```bash
 cd terraform
 terraform init
@@ -44,91 +53,56 @@ terraform plan
 terraform apply
 ```
 
-### 2. kubectlの設定
-
+3. kubectlの設定
 ```bash
-# Terraformの出力から設定コマンドを取得
-terraform output configure_kubectl
+aws eks update-kubeconfig --name $(terraform output -raw cluster_id) --region $(terraform output -raw region)
 ```
 
-### 3. Dockerイメージのビルドとプッシュ
-
-各アプリケーションのイメージをビルドしてECRにプッシュ:
-
+4. アプリケーションのビルドとデプロイ
 ```bash
-# ECRにログイン
+# ECRログイン
 eval $(terraform output docker_login_command)
 
-# カウンターアプリ
+# アプリケーションのビルドとプッシュ
 cd ../apps
-docker build --build-arg APP_DIR=app1 -t gradio-apps:counter .
-docker tag gradio-apps:counter $(terraform output -raw ecr_repository_url):counter
-docker push $(terraform output -raw ecr_repository_url):counter
+for app in counter calculator text; do
+  docker build --build-arg APP_DIR=app${app%counter?1:calculator?2:3} -t gradio-apps:$app .
+  docker tag gradio-apps:$app $(terraform output -raw ecr_repository_url):$app
+  docker push $(terraform output -raw ecr_repository_url):$app
+done
 
-# 計算機アプリ
-docker build --build-arg APP_DIR=app2 -t gradio-apps:calculator .
-docker tag gradio-apps:calculator $(terraform output -raw ecr_repository_url):calculator
-docker push $(terraform output -raw ecr_repository_url):calculator
-
-# テキスト変換アプリ
-docker build --build-arg APP_DIR=app3 -t gradio-apps:text .
-docker tag gradio-apps:text $(terraform output -raw ecr_repository_url):text
-docker push $(terraform output -raw ecr_repository_url):text
+# Kubernetesへのデプロイ
+kubectl apply -f k8s-deployments.yaml
 ```
 
-### 4. Kubernetesにデプロイ
-
+5. アプリケーションのアクセス
 ```bash
-kubectl apply -f apps/k8s-deployments.yaml
-```
-
-### 5. アプリケーションのアクセス
-
-```bash
-# 各サービスのエンドポイントを取得
 kubectl get service
-
-# ブラウザで各エンドポイントにアクセス
+# 各サービスのELBエンドポイントにアクセス
 ```
 
-## 📝 設定のカスタマイズ
+## ⚙️ リソースの最適化
 
-- `terraform/variables.tf`: クラスター設定のカスタマイズ
-- `apps/k8s-deployments.yaml`: Kubernetesリソースの設定
-- `apps/*/app.py`: 各アプリケーションのコード
+### 現在の設定
 
-## 🔄 ノードとPodの配置最適化
-
-### リソース使用状況
-現在の3つのアプリケーションの実行に必要なリソース:
-- 合計CPU要求: 300m (100m × 3アプリ)
-- 合計メモリ要求: 768Mi (256Mi × 3アプリ)
-
-### 現在のPodの配置
-```bash
-# Podの配置状況を確認
-kubectl get pods -o wide
-```
-
-現在は全てのPodが同一ノード上で実行されています:
-- カウンターアプリ (gradio-counter-app) → ip-10-0-1-7
-- 計算機アプリ (gradio-calculator-app) → ip-10-0-1-7
-- テキスト変換アプリ (gradio-text-app) → ip-10-0-1-7
-
-これは現在の負荷が低く、1つのノードで十分に処理できるためです。
+- 各アプリケーションのリソース要求:
+  - CPU: 100m
+  - メモリ: 256Mi
 
 ### 推奨ノード設定
-`terraform/variables.tf`での推奨設定:
+
 ```hcl
-node_desired_capacity = 1  # 通常時は1台で運用
-node_max_capacity     = 3  # 負荷増大時に備えて最大3台まで
-node_min_capacity     = 1  # 最小1台を維持
+# terraform/variables.tf
+node_desired_capacity = 1  # 通常運用
+node_max_capacity     = 3  # 負荷対応
+node_min_capacity     = 1  # 最小構成
 ```
 
-この設定の利点:
-- コスト効率の向上（使用していないノードの削減）
-- 必要時のみスケールアウトする柔軟な構成
-- 1台のt3.medium（2vCPU, 4GB RAM）で十分な現在の負荷に対する適切な対応
+### スケーリングの考え方
+
+- 通常時は1ノードで十分な処理が可能
+- 負荷増大時は自動でスケールアウト（最大3ノード）
+- コスト最適化のため、不要なノードは自動削除
 
 ## 🧹 クリーンアップ
 
@@ -136,19 +110,13 @@ node_min_capacity     = 1  # 最小1台を維持
 # アプリケーションの削除
 kubectl delete -f apps/k8s-deployments.yaml
 
-# インフラストラクチャの削除
+# インフラの削除
 cd terraform
 terraform destroy
 ```
 
 ## ⚠️ 注意事項
 
-- これはデモ用のサンプルプロジェクトです
+- このプロジェクトはデモ用のサンプルです
 - 本番環境では適切なセキュリティ設定を行ってください
-- 使用後は必ずリソースを削除して、不要な課金を防いでください
-
-## 📚 参考リンク
-
-- [AWS EKSドキュメント](https://docs.aws.amazon.com/eks/)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Gradio Documentation](https://gradio.app/docs/)
+- 使用後は必ずリソースを削除してください
