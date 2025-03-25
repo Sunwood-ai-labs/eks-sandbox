@@ -1,0 +1,134 @@
+# カウンターアプリ (App1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-counter-app
+  labels:
+    app: gradio-counter-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-counter-app
+  template:
+    metadata:
+      labels:
+        app: gradio-counter-app
+    spec:
+      containers:
+      - name: gradio-counter-app
+        image: ${ECR_REPOSITORY_URL}:counter
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-counter-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: gradio-counter-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 7860
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+---
+# 計算機アプリ (App2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-calculator-app
+  labels:
+    app: gradio-calculator-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-calculator-app
+  template:
+    metadata:
+      labels:
+        app: gradio-calculator-app
+    spec:
+      containers:
+      - name: gradio-calculator-app
+        image: ${ECR_REPOSITORY_URL}:calculator
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-calculator-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: gradio-calculator-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 7860
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+---
+# テキスト変換アプリ (App3)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-text-app
+  labels:
+    app: gradio-text-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-text-app
+  template:
+    metadata:
+      labels:
+        app: gradio-text-app
+    spec:
+      containers:
+      - name: gradio-text-app
+        image: ${ECR_REPOSITORY_URL}:text
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-text-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: gradio-text-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 7860
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
