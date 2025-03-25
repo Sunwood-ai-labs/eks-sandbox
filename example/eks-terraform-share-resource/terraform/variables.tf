@@ -55,7 +55,7 @@ variable "node_instance_type" {
 variable "node_desired_capacity" {
   description = "Desired number of nodes"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "node_max_capacity" {
