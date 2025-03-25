@@ -1,25 +1,50 @@
-# EKS Terraform Gradio Sample
+<div align="center">
+
+# EKS Terraform Gradio Sample 🚀
+
+[![Terraform](https://img.shields.io/badge/Terraform-1.0%2B-623CE4)](https://www.terraform.io/)
+[![AWS](https://img.shields.io/badge/AWS-EKS-FF9900)](https://aws.amazon.com/eks/)
+[![Gradio](https://img.shields.io/badge/Gradio-5.x-orange)](https://gradio.app/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/)
 
 TerraformでEKSクラスターを作成し、Gradioアプリケーションをデプロイするサンプルプロジェクトです。
 
-![](./asset/flow.svg)
+![Infrastructure Overview](./asset/flow.svg)
 
-## 前提条件
+</div>
+
+## 📚 目次
+- [📚 目次](#-目次)
+- [🔧 前提条件](#-前提条件)
+- [📁 プロジェクト構成](#-プロジェクト構成)
+- [🚀 デプロイ手順](#-デプロイ手順)
+  - [1. EKSクラスターの作成](#1-eksクラスターの作成)
+  - [2. Gradioアプリケーションのデプロイ](#2-gradioアプリケーションのデプロイ)
+- [⚙️ 設定のカスタマイズ](#️-設定のカスタマイズ)
+- [❓ トラブルシューティング](#-トラブルシューティング)
+  - [ノードグループが作成されない場合](#ノードグループが作成されない場合)
+  - [アプリケーションがデプロイできない場合](#アプリケーションがデプロイできない場合)
+- [📋 デプロイメント出力例](#-デプロイメント出力例)
+  - [アプリケーションの再起動](#アプリケーションの再起動)
+- [⚠️ 注意事項](#️-注意事項)
+
+## 🔧 前提条件
 
 - AWS CLI (設定済み)
 - Terraform v1.0.0以上
 - kubectl
 - Docker
 
-## プロジェクト構成
+## 📁 プロジェクト構成
 
-```
+```plaintext
 .
 ├── gradio-app/          # Gradioアプリケーション
 └── terraform/           # EKSクラスター用Terraform設定
 ```
 
-## デプロイ手順
+## 🚀 デプロイ手順
 
 ### 1. EKSクラスターの作成
 
@@ -73,25 +98,13 @@ kubectl apply -f k8s-deployment.yaml
 kubectl get service gradio-app-service
 ```
 
-## クリーンアップ
-
-1. アプリケーションの削除：
-```bash
-kubectl delete -f k8s-deployment.yaml
-```
-
-2. EKSクラスターの削除：
-```bash
-terraform destroy
-```
-
-## 設定のカスタマイズ
+## ⚙️ 設定のカスタマイズ
 
 - `variables.tf`: クラスター名やノードグループの設定を変更できます
 - `vpc.tf`: VPCやサブネットの設定をカスタマイズできます
 - `eks.tf`: EKSクラスターの詳細設定を変更できます
 
-## トラブルシューティング
+## ❓ トラブルシューティング
 
 ### ノードグループが作成されない場合
 - VPCのサブネットタグを確認してください
@@ -101,7 +114,7 @@ terraform destroy
 - ECRのイメージパスが正しいか確認してください
 - k8s-deployment.yamlのイメージ参照を確認してください
 
-## デプロイメント出力例
+## 📋 デプロイメント出力例
 
 ### アプリケーションの再起動
 ```bash
@@ -116,8 +129,7 @@ gradio-app-675dbd69d5-x5mrc   1/1     Running       0               11s
 gradio-app-9fbc54c68-kbf9k    1/1     Terminating   7 (6m50s ago)   13m
 ```
 
-
-## 注意事項
+## ⚠️ 注意事項
 
 - このプロジェクトはサンプルです。本番環境では適切なセキュリティ設定を行ってください。
 - 不要な課金を防ぐため、使用後は必ずリソースを削除してください。
