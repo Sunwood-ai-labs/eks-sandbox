@@ -1,5 +1,7 @@
 <div align="center">
 
+![Image](https://github.com/user-attachments/assets/0f03897e-a242-4265-a857-2cc83532a60b)
+
 # EKS-Sample Project Repository 🚀
 
 このリポジトリは、AWS EKSに関連するサンプルプロジェクトを集めたものです。
