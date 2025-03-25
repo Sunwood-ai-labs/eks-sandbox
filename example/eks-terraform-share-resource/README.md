@@ -1,5 +1,7 @@
 # EKS Shared Resources Sample 🚀
 
+![Image](https://github.com/user-attachments/assets/3585a45e-f7cd-43a2-b9b4-1c4fb57d5ca0)
+
 複数のGradioアプリケーションをAWS EKSクラスターで効率的に実行するサンプルプロジェクト
 
 ## 📑 目次
