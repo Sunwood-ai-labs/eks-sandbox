@@ -1,6 +1,15 @@
+<div align="center">
+
 # EKS Shared Resources Sample 🚀
 
 ![Image](https://github.com/user-attachments/assets/fd170d5c-8df4-4261-8e45-bd8e7a9a1511)
+
+[![AWS](https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+
+</div>
 
 複数のGradioアプリケーションをAWS EKSクラスターで効率的に実行するサンプルプロジェクト
 
