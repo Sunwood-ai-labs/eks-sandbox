@@ -9,8 +9,6 @@
 
 EKSにデプロイするためのシンプルなGradioアプリケーションです。
 
-<img src="./example_sketch.png" alt="Application Screenshot" width="600"/>
-
 </div>
 
 ## 📚 目次
@@ -24,6 +22,10 @@ EKSにデプロイするためのシンプルなGradioアプリケーション�
 - [🔧 トラブルシューティング](#-トラブルシューティング)
   - [Gradio 5.xのインストールエラー](#gradio-5xのインストールエラー)
 - [📦 デプロイ手順](#-デプロイ手順)
+- [🔒 セキュリティ設定](#-セキュリティ設定)
+  - [コンテナセキュリティ](#コンテナセキュリティ)
+  - [環境変数管理](#環境変数管理)
+  - [ネットワークセキュリティ](#ネットワークセキュリティ)
 - [📝 注意事項](#-注意事項)
 
 ## 🌟 アプリケーションの概要
@@ -41,7 +43,7 @@ EKSにデプロイするためのシンプルなGradioアプリケーション�
 
 1. リポジトリをクローンします：
 ```bash
-git clone <repository-url>
+git clone https://github.com/Sunwood-ai-labs/eks-terraform-gradio-sample.git
 cd gradio-app
 ```
 
@@ -96,13 +98,43 @@ docker tag gradio-app:latest <your-registry>/gradio-app:latest
 docker push <your-registry>/gradio-app:latest
 ```
 
-4. Kubernetesへのデプロイ：
+4. 環境変数の設定：
+```bash
+# k8s-deployment.yamlのイメージURLを更新
+sed -i 's|<your-registry>|YOUR-ECR-REGISTRY|g' k8s-deployment.yaml
+```
+
+5. Kubernetesへのデプロイ：
 ```bash
 kubectl apply -f k8s-deployment.yaml
 ```
 
+## 🔒 セキュリティ設定
+
+### コンテナセキュリティ
+- non-rootユーザーでコンテナを実行
+- 最小限の権限原則に従う
+- 脆弱性スキャンを定期的に実行
+
+### 環境変数管理
+- 機密情報はKubernetes Secretsとして管理
+- 本番環境の値は`.env`ファイルにコミットしない
+- 環境変数のサンプルは`.env.example`として提供
+
+### ネットワークセキュリティ
+- コンテナ間通信の制限
+- 必要最小限のポートのみ公開
+- TLS/SSL証明書の使用
+
 ## 📝 注意事項
 
 - 本番環境にデプロイする際は、適切なセキュリティ設定を行ってください。
+  - コンテナイメージの脆弱性スキャン
+  - ネットワークポリシーの設定
+  - リソースクォータの設定
 - 環境変数やシークレットは適切に管理してください。
+  - Kubernetes Secretsの使用
+  - 暗号化の適用
 - リソースの制限値は必要に応じて調整してください。
+  - CPU/メモリの制限
+  - オートスケーリングの設定

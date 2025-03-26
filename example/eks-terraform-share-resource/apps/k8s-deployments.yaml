@@ -1,0 +1,125 @@
+# カウンターアプリ (App1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-counter-app
+  labels:
+    app: gradio-counter-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-counter-app
+  template:
+    metadata:
+      labels:
+        app: gradio-counter-app
+    spec:
+      containers:
+      - name: gradio-counter-app
+        image: 498218886114.dkr.ecr.ap-northeast-1.amazonaws.com/gradio-apps:counter
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-counter-app-service
+spec:
+  selector:
+    app: gradio-counter-app
+  ports:
+  - port: 80
+    targetPort: 7860
+  type: LoadBalancer
+---
+# 計算機アプリ (App2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-calculator-app
+  labels:
+    app: gradio-calculator-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-calculator-app
+  template:
+    metadata:
+      labels:
+        app: gradio-calculator-app
+    spec:
+      containers:
+      - name: gradio-calculator-app
+        image: 498218886114.dkr.ecr.ap-northeast-1.amazonaws.com/gradio-apps:calculator
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-calculator-app-service
+spec:
+  selector:
+    app: gradio-calculator-app
+  ports:
+  - port: 80
+    targetPort: 7860
+  type: LoadBalancer
+---
+# テキスト変換アプリ (App3)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradio-text-app
+  labels:
+    app: gradio-text-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradio-text-app
+  template:
+    metadata:
+      labels:
+        app: gradio-text-app
+    spec:
+      containers:
+      - name: gradio-text-app
+        image: 498218886114.dkr.ecr.ap-northeast-1.amazonaws.com/gradio-apps:text
+        ports:
+        - containerPort: 7860
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradio-text-app-service
+spec:
+  selector:
+    app: gradio-text-app
+  ports:
+  - port: 80
+    targetPort: 7860
+  type: LoadBalancer
