@@ -42,3 +42,6 @@ example/eks-terraform-share-resource-53/.env
 
 .env
 example/eks-terraform-share-resource-53/terraform/.terraform.lock.hcl
+**/.SourceSageAssets/
+
+issue_creator.log
