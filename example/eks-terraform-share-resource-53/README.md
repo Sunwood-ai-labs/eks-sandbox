@@ -1,7 +1,5 @@
 <div align="center">
 
-# EKS Shared Resources Sample 🚀
-
 ![Image](https://github.com/user-attachments/assets/fd170d5c-8df4-4261-8e45-bd8e7a9a1511)
 
 [![AWS](https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
@@ -9,12 +7,15 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
+# EKS Shared Resources Sample 🚀
+
 </div>
 
 複数のGradioアプリケーションをAWS EKSクラスターで効率的に実行するサンプルプロジェクト
 
 ## 📑 目次
 - [📑 目次](#-目次)
+- [📚 プロジェクトドキュメント](#-プロジェクトドキュメント)
 - [📱 概要](#-概要)
 - [🛠️ 技術スタック](#️-技術スタック)
 - [📋 前提条件](#-前提条件)
@@ -27,6 +28,17 @@
   - [スケーリングの考え方](#スケーリングの考え方)
 - [🧹 クリーンアップ](#-クリーンアップ)
 - [⚠️ 注意事項](#️-注意事項)
+
+## 📚 プロジェクトドキュメント
+
+### インフラストラクチャ
+- [Terraformリソース設定](./terraform/README.md)
+
+### アプリケーション
+- [アプリケーション概要](./apps/README.md)
+  - [カウンターアプリ](./apps/app1/README.md)
+  - [計算機アプリ](./apps/app2/README.md)
+  - [テキスト変換アプリ](./apps/app3/README.md)
 
 ## 📱 概要
 
